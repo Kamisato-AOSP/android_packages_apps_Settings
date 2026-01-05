@@ -198,11 +198,11 @@
     <com.android.settings.widget.HomepagePreference
         android:fragment="com.android.settings.KamisatoLabsFragment"
         android:icon="@drawable/ic_star_24dp"
-        android:key="top_level_kamisato_addons"
+        android:key="top_level_kamisato_labs"
         android:order="5"
         android:title="@string/kamisato_labs_title"
         android:summary="The Boom-Boom Lab"
-        settings:highlightableMenuKey="top_level_kamisato_addons"/>
+        settings:highlightableMenuKey="top_level_kamisato_labs"/>
 
     <com.android.settings.widget.HomepagePreference
         android:fragment="com.android.settings.system.SystemDashboardFragment"
