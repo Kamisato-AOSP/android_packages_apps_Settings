@@ -29,6 +29,17 @@
             android:title="@string/pif_data_title"
             android:summary="@string/pif_data_summary"
             android:defaultValue=""/>
+
+        <!-- Lid event behavior -->
+        <ListPreference
+            android:key="lid_behavior"
+            android:title="@string/lid_behavior_title"
+            android:summary="@string/lid_behavior_summary"
+            android:entries="@array/lid_behavior_entries"
+            android:entryValues="@array/lid_behavior_values"
+            android:dialogTitle="@string/lid_behavior_title"
+            settings:controller="com.android.settings.display.LidBehaviorPreferenceController" />
+            
     </PreferenceCategory>
 
 </PreferenceScreen>
