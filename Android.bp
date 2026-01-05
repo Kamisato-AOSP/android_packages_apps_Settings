@@ -55,6 +55,7 @@ android_library {
     srcs: [
         "src/**/*.java",
         "src/**/*.kt",
+        "KamisatoLabs/src/**/*.java",
     ],
     exclude_srcs: [
         "src/com/android/settings/biometrics/fingerprint2/lib/**/*.kt",
@@ -64,7 +65,8 @@ android_library {
         "res",
         "res-export", // for external usage
         "res-product",
-        "TouchGestures/res"
+        "TouchGestures/res",
+        "KamisatoLabs/res",
     ],
     optional_uses_libs: ["com.android.extensions.appfunctions"],
     static_libs: [
