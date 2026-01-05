@@ -143,6 +143,8 @@
     <string name="keywords_add_bt_device">bluetooth</string>
     <!-- Title for bluetooth auto on toggle [CHAR LIMIT=60] -->
     <string name="bluetooth_screen_auto_on_title">Automatically turn on tomorrow</string>
+    <!-- KamisatoLabs title -->
+    <string name="kamisato_labs_title">KamisatoLabs</string>
     <!-- Summary for bluetooth auto on toggle [CHAR LIMIT=60] -->
     <string name="bluetooth_screen_auto_on_summary">If you turn off Bluetooth, it turns on again the next day</string>
 
