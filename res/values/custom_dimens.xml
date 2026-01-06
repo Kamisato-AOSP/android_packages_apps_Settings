@@ -18,4 +18,21 @@
 <resources>
     <!-- Fingerprint -->
     <dimen name="fingerprint_find_sensor_padding_top">16dp</dimen>
+
+    <!-- Kamisato About Device -->
+    <dimen name="kamisato_header_height">180dp</dimen>
+    <dimen name="kamisato_header_padding">24dp</dimen>
+    <dimen name="kamisato_header_padding_top">32dp</dimen>
+    <dimen name="kamisato_card_corner_radius">16dp</dimen>
+    <dimen name="kamisato_card_margin_horizontal">16dp</dimen>
+    <dimen name="kamisato_card_margin_vertical">8dp</dimen>
+    <dimen name="kamisato_card_padding">16dp</dimen>
+    <dimen name="kamisato_card_icon_size">24dp</dimen>
+    <dimen name="kamisato_header_title_size">28sp</dimen>
+    <dimen name="kamisato_header_subtitle_size">16sp</dimen>
+    <dimen name="kamisato_header_info_size">12sp</dimen>
+    <dimen name="kamisato_info_label_size">14sp</dimen>
+    <dimen name="kamisato_info_value_size">16sp</dimen>
+    <dimen name="kamisato_info_row_spacing">12dp</dimen>
+    <dimen name="kamisato_info_icon_margin">16dp</dimen>
 </resources>

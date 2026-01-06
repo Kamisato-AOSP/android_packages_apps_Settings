@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2018 The Android Open Source Project
+ * Copyright (C) 2024-2025 Kamisato-AOSP
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +24,12 @@ import android.app.settings.SettingsEnums;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.UserInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.UserManager;
+import android.text.format.DateFormat;
 import android.view.View;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -45,6 +49,16 @@ import com.android.settings.deviceinfo.SafetyInfoPreferenceController;
 import com.android.settings.deviceinfo.UptimePreferenceController;
 import com.android.settings.deviceinfo.WifiMacAddressPreferenceController;
 import com.android.settings.deviceinfo.imei.ImeiInfoPreferenceController;
+import com.android.settings.deviceinfo.kamisato.KamisatoBuildDatePreferenceController;
+import com.android.settings.deviceinfo.kamisato.KamisatoDeviceCodenamePreferenceController;
+import com.android.settings.deviceinfo.kamisato.KamisatoDisplayPreferenceController;
+import com.android.settings.deviceinfo.kamisato.KamisatoFrontCameraPreferenceController;
+import com.android.settings.deviceinfo.kamisato.KamisatoMaintainerPreferenceController;
+import com.android.settings.deviceinfo.kamisato.KamisatoRamPreferenceController;
+import com.android.settings.deviceinfo.kamisato.KamisatoRearCameraPreferenceController;
+import com.android.settings.deviceinfo.kamisato.KamisatoRomNamePreferenceController;
+import com.android.settings.deviceinfo.kamisato.KamisatoSocPreferenceController;
+import com.android.settings.deviceinfo.kamisato.KamisatoStoragePreferenceController;
 import com.android.settings.deviceinfo.simstatus.EidStatus;
 import com.android.settings.deviceinfo.simstatus.SimEidPreferenceController;
 import com.android.settings.deviceinfo.simstatus.SimStatusPreferenceController;
@@ -52,13 +66,18 @@ import com.android.settings.deviceinfo.simstatus.SlotSimStatus;
 import com.android.settings.flags.Flags;
 import com.android.settings.search.BaseSearchIndexProvider;
 import com.android.settings.widget.EntityHeaderController;
+import com.android.settingslib.DeviceInfoUtils;
 import com.android.settingslib.core.AbstractPreferenceController;
 import com.android.settingslib.core.lifecycle.Lifecycle;
 import com.android.settingslib.search.SearchIndexable;
 import com.android.settingslib.widget.LayoutPreference;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -71,6 +90,7 @@ public class MyDeviceInfoFragment extends DashboardFragment
     private static final String LOG_TAG = "MyDeviceInfoFragment";
     private static final String KEY_EID_INFO = "eid_info";
     private static final String KEY_MY_DEVICE_INFO_HEADER = "my_device_info_header";
+    private static final String KEY_KAMISATO_ABOUT_HEADER = "kamisato_about_header";
 
     private BuildNumberPreferenceController mBuildNumberPreferenceController;
 
@@ -95,6 +115,7 @@ public class MyDeviceInfoFragment extends DashboardFragment
     @Override
     public void onStart() {
         super.onStart();
+        initKamisatoHeader();
     }
 
     @Override
@@ -131,6 +152,18 @@ public class MyDeviceInfoFragment extends DashboardFragment
         controllers.add(new FeedbackPreferenceController(fragment, context));
         controllers.add(new FccEquipmentIdPreferenceController(context));
         controllers.add(new UptimePreferenceController(context, lifecycle));
+
+        // Kamisato preference controllers
+        controllers.add(new KamisatoDeviceCodenamePreferenceController(context, "kamisato_device_codename"));
+        controllers.add(new KamisatoMaintainerPreferenceController(context, "kamisato_maintainer"));
+        controllers.add(new KamisatoSocPreferenceController(context, "kamisato_soc"));
+        controllers.add(new KamisatoRamPreferenceController(context, "kamisato_ram"));
+        controllers.add(new KamisatoStoragePreferenceController(context, "kamisato_storage"));
+        controllers.add(new KamisatoDisplayPreferenceController(context, "kamisato_display"));
+        controllers.add(new KamisatoFrontCameraPreferenceController(context, "kamisato_front_camera"));
+        controllers.add(new KamisatoRearCameraPreferenceController(context, "kamisato_rear_camera"));
+        controllers.add(new KamisatoRomNamePreferenceController(context, "kamisato_rom_name"));
+        controllers.add(new KamisatoBuildDatePreferenceController(context, "kamisato_build_date"));
 
         Consumer<String> imeiInfoList = imeiKey -> {
             if (Flags.catalystMyDeviceInfoPrefScreen()) {
@@ -179,36 +212,52 @@ public class MyDeviceInfoFragment extends DashboardFragment
     }
 
     private void initHeader() {
-        // TODO: Migrate into its own controller.
+        // Legacy header - keep for compatibility but don't display
         final LayoutPreference headerPreference =
                 getPreferenceScreen().findPreference(KEY_MY_DEVICE_INFO_HEADER);
-        final boolean shouldDisplayHeader = getContext().getResources().getBoolean(
-                R.bool.config_show_device_header_in_device_info);
-        headerPreference.setVisible(shouldDisplayHeader);
-        if (!shouldDisplayHeader) {
+        if (headerPreference != null) {
+            headerPreference.setVisible(false);
+        }
+    }
+
+    /**
+     * Initialize the Kamisato hero header with device name, Android version, and security patch.
+     */
+    private void initKamisatoHeader() {
+        final LayoutPreference kamisatoHeader =
+                getPreferenceScreen().findPreference(KEY_KAMISATO_ABOUT_HEADER);
+        if (kamisatoHeader == null) {
             return;
         }
-        final View headerView = headerPreference.findViewById(R.id.entity_header);
-        final Activity context = getActivity();
-        final Bundle bundle = getArguments();
-        final EntityHeaderController controller = EntityHeaderController
-                .newInstance(context, this, headerView)
-                .setButtonActions(EntityHeaderController.ActionType.ACTION_NONE,
-                        EntityHeaderController.ActionType.ACTION_NONE);
 
-        // TODO: There may be an avatar setting action we can use here.
-        final int iconId = bundle.getInt("icon_id", 0);
-        if (iconId == 0) {
-            final UserManager userManager = (UserManager) getActivity().getSystemService(
-                    Context.USER_SERVICE);
-            final UserInfo info = Utils.getExistingUser(userManager,
-                    android.os.Process.myUserHandle());
-            controller.setLabel(info.name);
-            controller.setIcon(
-                    com.android.settingslib.Utils.getUserIcon(getActivity(), userManager, info));
+        // Set device name
+        final TextView deviceNameView = kamisatoHeader.findViewById(R.id.kamisato_device_name);
+        if (deviceNameView != null) {
+            deviceNameView.setText(Build.MODEL);
         }
 
-        controller.done(true /* rebindActions */);
+        // Set Android version
+        final TextView androidVersionView = kamisatoHeader.findViewById(R.id.kamisato_android_version);
+        if (androidVersionView != null) {
+            androidVersionView.setText(getString(R.string.kamisato_android_version) + " " + Build.VERSION.RELEASE);
+        }
+
+        // Set security patch
+        final TextView securityPatchView = kamisatoHeader.findViewById(R.id.kamisato_security_patch);
+        if (securityPatchView != null) {
+            String patch = DeviceInfoUtils.getSecurityPatch();
+            if (patch != null && !patch.isEmpty()) {
+                try {
+                    SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+                    SimpleDateFormat outputFormat = new SimpleDateFormat("MMMM yyyy", Locale.getDefault());
+                    Date date = inputFormat.parse(patch);
+                    patch = outputFormat.format(date);
+                } catch (ParseException e) {
+                    // Keep original format if parsing fails
+                }
+            }
+            securityPatchView.setText(patch != null ? patch : getString(R.string.kamisato_unknown));
+        }
     }
 
     @Override

@@ -360,4 +360,25 @@
     <string name="network_traffic_units_kilobytes">Kilobytes per second (kB/s)</string>
     <string name="network_traffic_units_megabytes">Megabytes per second (MB/s)</string>
     <string name="network_traffic_units_auto">Automatic (kB/s or MB/s)</string>
+
+    <!-- Kamisato About Device -->
+    <string name="kamisato_about_rom_name">Kamisato-AOSP</string>
+    <string name="kamisato_about_device_info">Device Information</string>
+    <string name="kamisato_about_hardware_info">Hardware Information</string>
+    <string name="kamisato_about_camera_info">Camera Information</string>
+    <string name="kamisato_about_rom_info">ROM Information</string>
+    <string name="kamisato_device_codename">Device Codename</string>
+    <string name="kamisato_maintainer">Maintainer</string>
+    <string name="kamisato_soc">Processor</string>
+    <string name="kamisato_display">Display</string>
+    <string name="kamisato_front_camera">Front Camera</string>
+    <string name="kamisato_rear_camera">Rear Camera</string>
+    <string name="kamisato_ram">RAM</string>
+    <string name="kamisato_storage">Storage</string>
+    <string name="kamisato_rom_version">ROM Version</string>
+    <string name="kamisato_build_date">Build Date</string>
+    <string name="kamisato_kernel_version">Kernel Version</string>
+    <string name="kamisato_android_version">Android Version</string>
+    <string name="kamisato_security_patch">Security Patch</string>
+    <string name="kamisato_unknown">Unknown</string>
 </resources>
