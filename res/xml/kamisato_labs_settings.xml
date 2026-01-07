@@ -24,11 +24,21 @@
         android:title="General">
         
         <!--Hehe just some playground-->
+
+        <!-- PIF XML configuration -->
         <com.android.settings.development.PifDataPreference
             android:key="pif_data_setting"
             android:title="@string/pif_data_title"
             android:summary="@string/pif_data_summary"
             android:defaultValue=""/>
+
+        <!-- Keybox XML configuration -->
+        <com.android.settings.development.KeyboxDataPreference
+            android:key="keybox_data_setting"
+            android:title="@string/keybox_data_title"
+            android:summary="@string/keybox_data_summary"
+            android:defaultValue=""/>
+
 
         <!-- Lid event behavior -->
         <ListPreference
