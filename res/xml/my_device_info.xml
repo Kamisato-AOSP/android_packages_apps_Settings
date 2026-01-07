@@ -37,15 +37,6 @@
         android:title="@string/kamisato_about_device_info"
         android:icon="@drawable/ic_kamisato_device">
 
-        <!-- Device name -->
-        <com.android.settings.widget.ValidatedEditTextPreference
-            android:key="device_name"
-            android:order="11"
-            android:title="@string/my_device_info_device_name_preference_title"
-            android:summary="@string/summary_placeholder"
-            settings:controller="com.android.settings.deviceinfo.DeviceNamePreferenceController"
-            settings:enableCopying="true"/>
-
         <!-- Device Codename (ro.kamisato.device) -->
         <Preference
             android:key="kamisato_device_codename"
@@ -190,16 +181,6 @@
             android:summary="@string/summary_placeholder"
             android:selectable="false"
             settings:controller="com.android.settings.deviceinfo.kamisato.KamisatoBuildDatePreferenceController"
-            settings:enableCopying="true"/>
-
-        <!-- Kernel Version -->
-        <Preference
-            android:key="kernel_version"
-            android:order="45"
-            android:title="@string/kamisato_kernel_version"
-            android:summary="@string/summary_placeholder"
-            android:selectable="false"
-            settings:controller="com.android.settings.deviceinfo.KernelVersionPreferenceController"
             settings:enableCopying="true"/>
 
         <!-- Build number (for developer options) -->

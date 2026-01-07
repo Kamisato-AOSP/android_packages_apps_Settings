@@ -39,7 +39,6 @@ import com.android.settings.Utils;
 import com.android.settings.dashboard.DashboardFragment;
 import com.android.settings.deviceinfo.BluetoothAddressPreferenceController;
 import com.android.settings.deviceinfo.BuildNumberPreferenceController;
-import com.android.settings.deviceinfo.DeviceNamePreferenceController;
 import com.android.settings.deviceinfo.FccEquipmentIdPreferenceController;
 import com.android.settings.deviceinfo.FeedbackPreferenceController;
 import com.android.settings.deviceinfo.IpAddressPreferenceController;
@@ -84,8 +83,7 @@ import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 @SearchIndexable
-public class MyDeviceInfoFragment extends DashboardFragment
-        implements DeviceNamePreferenceController.DeviceNamePreferenceHost {
+public class MyDeviceInfoFragment extends DashboardFragment {
 
     private static final String LOG_TAG = "MyDeviceInfoFragment";
     private static final String KEY_EID_INFO = "eid_info";
@@ -107,7 +105,6 @@ public class MyDeviceInfoFragment extends DashboardFragment
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        use(DeviceNamePreferenceController.class).setHost(this /* parent */);
         mBuildNumberPreferenceController = use(BuildNumberPreferenceController.class);
         mBuildNumberPreferenceController.setHost(this /* parent */);
     }
@@ -230,10 +227,14 @@ public class MyDeviceInfoFragment extends DashboardFragment
             return;
         }
 
-        // Set device name
+        // Set device name from ro.kamisato.device (device codename)
         final TextView deviceNameView = kamisatoHeader.findViewById(R.id.kamisato_device_name);
         if (deviceNameView != null) {
-            deviceNameView.setText(Build.MODEL);
+            String deviceCodename = android.os.SystemProperties.get("ro.kamisato.device", "");
+            if (deviceCodename.isEmpty()) {
+                deviceCodename = Build.MODEL; // Fallback to Build.MODEL if not set
+            }
+            deviceNameView.setText(deviceCodename);
         }
 
         // Set Android version
@@ -260,14 +261,13 @@ public class MyDeviceInfoFragment extends DashboardFragment
         }
     }
 
-    @Override
-    public void showDeviceNameWarningDialog(String deviceName) {
-        DeviceNameWarningDialog.show(this);
-    }
-
+    /**
+     * Called when user confirms or cancels device name change in DeviceNameWarningDialog.
+     * This method is required by DeviceNameWarningDialog even if device_name preference is not shown.
+     */
     public void onSetDeviceNameConfirm(boolean confirm) {
-        final DeviceNamePreferenceController controller = use(DeviceNamePreferenceController.class);
-        controller.updateDeviceName(confirm);
+        // No-op since device_name preference is not in our layout
+        // but this method is still needed for DeviceNameWarningDialog compatibility
     }
 
     @Override
