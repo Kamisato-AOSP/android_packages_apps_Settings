@@ -381,4 +381,8 @@
     <string name="kamisato_android_version">Android Version</string>
     <string name="kamisato_security_patch">Security Patch</string>
     <string name="kamisato_unknown">Unknown</string>
+
+    <!-- LMO Sidebar -->
+    <string name="lmo_sidebar_title">Sidebar</string>
+    <string name="lmo_sidebar_summary">Configure sidebar for quick app access in freeform windows</string>
 </resources>

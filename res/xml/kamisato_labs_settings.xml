@@ -49,6 +49,17 @@
             android:entryValues="@array/lid_behavior_values"
             android:dialogTitle="@string/lid_behavior_title"
             settings:controller="com.android.settings.display.LidBehaviorPreferenceController" />
+
+        <!-- LMO Sidebar -->
+        <Preference
+            android:key="lmo_sidebar_settings"
+            android:title="@string/lmo_sidebar_title"
+            android:summary="@string/lmo_sidebar_summary">
+            <intent
+                android:action="android.intent.action.MAIN"
+                android:targetPackage="com.libremobileos.sidebar"
+                android:targetClass="com.libremobileos.sidebar.ui.sidebar.SidebarSettingsActivity" />
+        </Preference>
             
     </PreferenceCategory>
 
