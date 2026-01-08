@@ -382,6 +382,10 @@
     <string name="kamisato_security_patch">Security Patch</string>
     <string name="kamisato_unknown">Unknown</string>
 
+    <!-- Kamisato Storage Card -->
+    <string name="kamisato_storage_card_title">Storage</string>
+    <string name="kamisato_ram_card_title">RAM</string>
+
     <!-- LMO Sidebar -->
     <string name="lmo_sidebar_title">Sidebar</string>
     <string name="lmo_sidebar_summary">Configure sidebar for quick app access in freeform windows</string>

@@ -30,6 +30,14 @@
         android:selectable="false"
         settings:allowDividerBelow="false" />
 
+    <!-- Kamisato Storage Card -->
+    <com.android.settingslib.widget.LayoutPreference
+        android:key="kamisato_storage_card"
+        android:order="5"
+        android:layout="@layout/kamisato_storage_card"
+        android:selectable="false"
+        settings:allowDividerBelow="false" />
+
     <!-- Device Information Card -->
     <PreferenceCategory
         android:key="kamisato_device_info_category"
@@ -84,16 +92,6 @@
             android:summary="@string/summary_placeholder"
             android:selectable="false"
             settings:controller="com.android.settings.deviceinfo.kamisato.KamisatoRamPreferenceController"
-            settings:enableCopying="true"/>
-
-        <!-- Storage (dynamic) -->
-        <Preference
-            android:key="kamisato_storage"
-            android:order="23"
-            android:title="@string/kamisato_storage"
-            android:summary="@string/summary_placeholder"
-            android:selectable="false"
-            settings:controller="com.android.settings.deviceinfo.kamisato.KamisatoStoragePreferenceController"
             settings:enableCopying="true"/>
 
         <!-- Display (ro.kamisato.display) -->

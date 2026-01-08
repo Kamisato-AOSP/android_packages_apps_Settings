@@ -25,7 +25,7 @@
     <dimen name="kamisato_header_padding_top">32dp</dimen>
     <dimen name="kamisato_card_corner_radius">16dp</dimen>
     <dimen name="kamisato_card_margin_horizontal">16dp</dimen>
-    <dimen name="kamisato_card_margin_vertical">8dp</dimen>
+    <dimen name="kamisato_card_margin_vertical">24dp</dimen>
     <dimen name="kamisato_card_padding">16dp</dimen>
     <dimen name="kamisato_card_icon_size">24dp</dimen>
     <dimen name="kamisato_header_title_size">28sp</dimen>
@@ -35,4 +35,12 @@
     <dimen name="kamisato_info_value_size">16sp</dimen>
     <dimen name="kamisato_info_row_spacing">12dp</dimen>
     <dimen name="kamisato_info_icon_margin">16dp</dimen>
+
+    <!-- Kamisato Storage Card -->
+    <dimen name="kamisato_storage_card_height">80dp</dimen>
+    <dimen name="kamisato_storage_progress_height">6dp</dimen>
+    <dimen name="kamisato_storage_progress_corner">3dp</dimen>
+    <dimen name="kamisato_storage_icon_size">32dp</dimen>
+    <dimen name="kamisato_storage_usage_size">22sp</dimen>
+    <dimen name="kamisato_storage_pill_radius">28dp</dimen>
 </resources>

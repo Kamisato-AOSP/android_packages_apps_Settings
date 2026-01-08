@@ -14,89 +14,95 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<LinearLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/kamisato_header_container"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:background="@drawable/kamisato_header_gradient"
-    android:paddingStart="@dimen/kamisato_header_padding"
-    android:paddingEnd="@dimen/kamisato_header_padding"
-    android:paddingTop="@dimen/kamisato_header_padding_top"
-    android:paddingBottom="@dimen/kamisato_header_padding"
-    android:layout_marginStart="@dimen/kamisato_card_margin_horizontal"
-    android:layout_marginEnd="@dimen/kamisato_card_margin_horizontal"
-    android:layout_marginTop="@dimen/kamisato_card_margin_vertical"
-    android:layout_marginBottom="@dimen/kamisato_card_margin_vertical"
-    android:gravity="center_horizontal">
+    android:paddingBottom="24dp">
 
-    <!-- Device Name (Dynamic from Build.MODEL) -->
-    <TextView
-        android:id="@+id/kamisato_device_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="@dimen/kamisato_header_title_size"
-        android:textStyle="bold"
-        android:textColor="?android:attr/textColorPrimary"
-        android:gravity="center"
-        tools:text="Pixel 8 Pro" />
-
-    <!-- ROM Branding -->
-    <TextView
-        android:id="@+id/kamisato_rom_branding"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="@string/kamisato_about_rom_name"
-        android:textSize="@dimen/kamisato_header_subtitle_size"
-        android:textColor="?android:attr/textColorSecondary"
-        android:textStyle="normal"
-        android:gravity="center" />
-
-    <!-- Version Info Row -->
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:id="@+id/kamisato_header_container"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:orientation="horizontal"
-        android:gravity="center">
+        android:orientation="vertical"
+        android:background="@drawable/kamisato_header_gradient"
+        android:paddingStart="@dimen/kamisato_header_padding"
+        android:paddingEnd="@dimen/kamisato_header_padding"
+        android:paddingTop="@dimen/kamisato_header_padding_top"
+        android:paddingBottom="@dimen/kamisato_header_padding"
+        android:layout_marginStart="@dimen/kamisato_card_margin_horizontal"
+        android:layout_marginEnd="@dimen/kamisato_card_margin_horizontal"
+        android:layout_marginTop="@dimen/kamisato_card_margin_vertical"
+        android:gravity="center_horizontal">
 
-        <!-- Android Version -->
+        <!-- Device Name (Dynamic from Build.MODEL) -->
         <TextView
-            android:id="@+id/kamisato_android_version"
+            android:id="@+id/kamisato_device_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="@dimen/kamisato_header_info_size"
-            android:textColor="?android:attr/textColorTertiary"
-            android:background="?android:attr/selectableItemBackgroundBorderless"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp"
-            android:paddingTop="6dp"
-            android:paddingBottom="6dp"
-            tools:text="Android 15" />
+            android:textSize="@dimen/kamisato_header_title_size"
+            android:textStyle="bold"
+            android:textColor="?android:attr/textColorPrimary"
+            android:gravity="center"
+            tools:text="Pixel 8 Pro" />
 
-        <View
-            android:layout_width="1dp"
-            android:layout_height="16dp"
-            android:background="?android:attr/textColorTertiary"
-            android:alpha="0.3" />
-
-        <!-- Security Patch -->
+        <!-- ROM Branding -->
         <TextView
-            android:id="@+id/kamisato_security_patch"
+            android:id="@+id/kamisato_rom_branding"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="@dimen/kamisato_header_info_size"
-            android:textColor="?android:attr/textColorTertiary"
-            android:background="?android:attr/selectableItemBackgroundBorderless"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp"
-            android:paddingTop="6dp"
-            android:paddingBottom="6dp"
-            tools:text="January 2026" />
+            android:layout_marginTop="8dp"
+            android:text="@string/kamisato_about_rom_name"
+            android:textSize="@dimen/kamisato_header_subtitle_size"
+            android:textColor="?android:attr/textColorSecondary"
+            android:textStyle="normal"
+            android:gravity="center" />
+
+        <!-- Version Info Row -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <!-- Android Version -->
+            <TextView
+                android:id="@+id/kamisato_android_version"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/kamisato_header_info_size"
+                android:textColor="?android:attr/textColorTertiary"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp"
+                tools:text="Android 15" />
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="16dp"
+                android:background="?android:attr/textColorTertiary"
+                android:alpha="0.3" />
+
+            <!-- Security Patch -->
+            <TextView
+                android:id="@+id/kamisato_security_patch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/kamisato_header_info_size"
+                android:textColor="?android:attr/textColorTertiary"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp"
+                tools:text="January 2026" />
+
+        </LinearLayout>
 
     </LinearLayout>
 
-</LinearLayout>
+</FrameLayout>

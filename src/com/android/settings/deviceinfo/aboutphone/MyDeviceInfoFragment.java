@@ -20,15 +20,25 @@ package com.android.settings.deviceinfo.aboutphone;
 import static androidx.core.content.ContextCompat.getMainExecutor;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.settings.SettingsEnums;
+import android.app.usage.StorageStatsManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.UserInfo;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.StatFs;
+import android.os.storage.StorageManager;
 import android.os.UserManager;
 import android.text.format.DateFormat;
+import android.text.format.Formatter;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -57,7 +67,6 @@ import com.android.settings.deviceinfo.kamisato.KamisatoRamPreferenceController;
 import com.android.settings.deviceinfo.kamisato.KamisatoRearCameraPreferenceController;
 import com.android.settings.deviceinfo.kamisato.KamisatoRomNamePreferenceController;
 import com.android.settings.deviceinfo.kamisato.KamisatoSocPreferenceController;
-import com.android.settings.deviceinfo.kamisato.KamisatoStoragePreferenceController;
 import com.android.settings.deviceinfo.simstatus.EidStatus;
 import com.android.settings.deviceinfo.simstatus.SimEidPreferenceController;
 import com.android.settings.deviceinfo.simstatus.SimStatusPreferenceController;
@@ -88,6 +97,7 @@ public class MyDeviceInfoFragment extends DashboardFragment {
     private static final String LOG_TAG = "MyDeviceInfoFragment";
     private static final String KEY_EID_INFO = "eid_info";
     private static final String KEY_MY_DEVICE_INFO_HEADER = "my_device_info_header";
+    private static final String KEY_KAMISATO_STORAGE_CARD = "kamisato_storage_card";
     private static final String KEY_KAMISATO_ABOUT_HEADER = "kamisato_about_header";
 
     private BuildNumberPreferenceController mBuildNumberPreferenceController;
@@ -113,6 +123,7 @@ public class MyDeviceInfoFragment extends DashboardFragment {
     public void onStart() {
         super.onStart();
         initKamisatoHeader();
+        initStorageCard();
     }
 
     @Override
@@ -155,7 +166,6 @@ public class MyDeviceInfoFragment extends DashboardFragment {
         controllers.add(new KamisatoMaintainerPreferenceController(context, "kamisato_maintainer"));
         controllers.add(new KamisatoSocPreferenceController(context, "kamisato_soc"));
         controllers.add(new KamisatoRamPreferenceController(context, "kamisato_ram"));
-        controllers.add(new KamisatoStoragePreferenceController(context, "kamisato_storage"));
         controllers.add(new KamisatoDisplayPreferenceController(context, "kamisato_display"));
         controllers.add(new KamisatoFrontCameraPreferenceController(context, "kamisato_front_camera"));
         controllers.add(new KamisatoRearCameraPreferenceController(context, "kamisato_rear_camera"));
@@ -261,6 +271,245 @@ public class MyDeviceInfoFragment extends DashboardFragment {
         }
     }
 
+    /**
+     * Initialize the storage card with used/total storage and progress bar.
+     */
+    private void initStorageCard() {
+        final LayoutPreference storageCard =
+                getPreferenceScreen().findPreference(KEY_KAMISATO_STORAGE_CARD);
+        if (storageCard == null) {
+            return;
+        }
+
+        final View cardContainer = storageCard.findViewById(R.id.kamisato_storage_card_container);
+        final TextView usageText = storageCard.findViewById(R.id.kamisato_storage_usage);
+        final ProgressBar progressBar = storageCard.findViewById(R.id.kamisato_storage_progress);
+
+        if (usageText == null || progressBar == null) {
+            return;
+        }
+
+        // Load storage info in background thread
+        final Context context = getContext();
+        Executors.newSingleThreadExecutor().execute(() -> {
+            try {
+                // Use StorageStatsManager for accurate storage like Storage settings
+                StorageStatsManager storageStatsManager = 
+                        context.getSystemService(StorageStatsManager.class);
+                
+                // Get actual system values
+                final long totalBytes = storageStatsManager.getTotalBytes(StorageManager.UUID_DEFAULT);
+                final long freeBytes = storageStatsManager.getFreeBytes(StorageManager.UUID_DEFAULT);
+                
+                // Calculate used storage accurately: Used = Total - Available
+                final long usedBytes = totalBytes - freeBytes;
+
+                // Round total to nearest standard size for display only
+                final long displayTotal = roundToNearestStandardSize(totalBytes);
+
+                // Calculate percentage based on actual total, not rounded
+                final int percentage = (int) ((usedBytes * 100) / totalBytes);
+
+                // Format sizes - used shows actual, total shows rounded for clean display
+                final String usedFormatted = formatStorageSizeAccurate(usedBytes);
+                final String totalFormatted = formatStorageSizeSimple(displayTotal);
+                final String usageString = usedFormatted + "/" + totalFormatted;
+
+                // Update UI on main thread
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> {
+                        usageText.setText(usageString);
+                        progressBar.setProgress(percentage);
+                        progressBar.setProgressTintList(ColorStateList.valueOf(getProgressColor(percentage)));
+                    });
+                }
+            } catch (Exception e) {
+                // Handle error gracefully
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> {
+                        usageText.setText(getString(R.string.kamisato_unknown));
+                        progressBar.setProgress(0);
+                    });
+                }
+            }
+        });
+
+        // Set click listener to open Storage settings
+        if (cardContainer != null) {
+            cardContainer.setOnClickListener(v -> {
+                Intent intent = new Intent(android.provider.Settings.ACTION_INTERNAL_STORAGE_SETTINGS);
+                startActivity(intent);
+            });
+        }
+
+        // Initialize RAM card as well
+        initRamCard(storageCard);
+    }
+
+    /**
+     * Initialize the RAM card with used/total RAM and progress bar.
+     */
+    private void initRamCard(LayoutPreference storageCard) {
+        if (storageCard == null) {
+            return;
+        }
+
+        final View ramContainer = storageCard.findViewById(R.id.kamisato_ram_card_container);
+        final TextView ramUsageText = storageCard.findViewById(R.id.kamisato_ram_usage);
+        final ProgressBar ramProgressBar = storageCard.findViewById(R.id.kamisato_ram_progress);
+
+        if (ramUsageText == null || ramProgressBar == null) {
+            return;
+        }
+
+        // Load RAM info using ActivityManager.MemoryInfo (same as Running Services)
+        final Context context = getContext();
+        Executors.newSingleThreadExecutor().execute(() -> {
+            try {
+                ActivityManager activityManager = context.getSystemService(ActivityManager.class);
+                ActivityManager.MemoryInfo memInfo = new ActivityManager.MemoryInfo();
+                activityManager.getMemoryInfo(memInfo);
+
+                final long totalRam = memInfo.totalMem;
+                final long availRam = memInfo.availMem;
+                final long usedRam = totalRam - availRam;
+
+                // Round total to nearest standard RAM size
+                final long roundedTotal = roundToNearestRamSize(totalRam);
+
+                // Calculate percentage based on rounded total
+                final int percentage = (int) ((usedRam * 100) / roundedTotal);
+
+                // Format sizes
+                final String usedFormatted = formatRamSize(usedRam);
+                final String totalFormatted = formatRamSize(roundedTotal);
+                final String usageString = usedFormatted + "/" + totalFormatted;
+
+                // Update UI on main thread
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> {
+                        ramUsageText.setText(usageString);
+                        ramProgressBar.setProgress(percentage);
+                        ramProgressBar.setProgressTintList(ColorStateList.valueOf(getProgressColor(percentage)));
+                    });
+                }
+            } catch (Exception e) {
+                // Handle error gracefully
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> {
+                        ramUsageText.setText(getString(R.string.kamisato_unknown));
+                        ramProgressBar.setProgress(0);
+                    });
+                }
+            }
+        });
+
+        // Set click listener to open Running Services
+        if (ramContainer != null) {
+            ramContainer.setOnClickListener(v -> {
+                Intent intent = new Intent();
+                intent.setClassName("com.android.settings",
+                        "com.android.settings.Settings$RunningServicesActivity");
+                try {
+                    startActivity(intent);
+                } catch (Exception e) {
+                    // Fallback to developer options if running services not accessible
+                }
+            });
+        }
+    }
+
+    /**
+     * Round bytes to nearest standard RAM size (4, 6, 8, 12, 16, 24, 32 GB).
+     */
+    private long roundToNearestRamSize(long bytes) {
+        long gb = 1024L * 1024L * 1024L;
+        long[] standardSizes = {4, 6, 8, 12, 16, 24, 32, 64};
+
+        long sizeInGb = bytes / gb;
+
+        for (long size : standardSizes) {
+            if (sizeInGb <= size) {
+                return size * gb;
+            }
+        }
+        // Default: round up
+        return ((sizeInGb + 4) / 8) * 8 * gb;
+    }
+
+    /**
+     * Format RAM size to compact GB format with decimal for small values.
+     */
+    private String formatRamSize(long bytes) {
+        double gb = bytes / (1024.0 * 1024.0 * 1024.0);
+        if (gb < 10) {
+            return String.format(java.util.Locale.US, "%.1fGB", gb);
+        }
+        return (int) gb + "GB";
+    }
+
+    /**
+     * Round bytes to nearest standard storage size (32, 64, 128, 256, 512, 1024 GB).
+     */
+    private long roundToNearestStandardSize(long bytes) {
+        long gb = 1024L * 1024L * 1024L;
+        long[] standardSizes = {32, 64, 128, 256, 512, 1024, 2048};
+
+        long sizeInGb = bytes / gb;
+
+        for (long size : standardSizes) {
+            if (sizeInGb <= size) {
+                return size * gb;
+            }
+        }
+        // Default: round to nearest 256 GB
+        return ((sizeInGb + 128) / 256) * 256 * gb;
+    }
+
+
+    /**
+     * Format storage size to compact GB format (e.g., "96GB").
+     */
+    private String formatStorageSize(long bytes) {
+        long gb = 1024L * 1024L * 1024L;
+        long sizeInGb = bytes / gb;
+        return sizeInGb + "GB";
+    }
+
+    /**
+     * Format storage size accurately with decimal for used storage (e.g., "22.4GB").
+     */
+    private String formatStorageSizeAccurate(long bytes) {
+        double gb = bytes / (1024.0 * 1024.0 * 1024.0);
+        if (gb < 100) {
+            // Show one decimal for better accuracy
+            return String.format(java.util.Locale.US, "%.1fGB", gb);
+        }
+        return (int) gb + "GB";
+    }
+
+    /**
+     * Format storage size simply for total display (e.g., "128GB").
+     */
+    private String formatStorageSizeSimple(long bytes) {
+        long gb = 1024L * 1024L * 1024L;
+        long sizeInGb = bytes / gb;
+        return sizeInGb + "GB";
+    }
+
+    /**
+     * Get progress bar color based on usage percentage.
+     * <50% = Green, <80% = Orange, >=80% = Red
+     */
+    private int getProgressColor(int percentage) {
+        if (percentage < 50) {
+            return Color.parseColor("#4CAF50"); // Green
+        } else if (percentage < 80) {
+            return Color.parseColor("#FF9800"); // Orange
+        } else {
+            return Color.parseColor("#F44336"); // Red
+        }
+    }
     /**
      * Called when user confirms or cancels device name change in DeviceNameWarningDialog.
      * This method is required by DeviceNameWarningDialog even if device_name preference is not shown.
